@@ -1,18 +1,18 @@
+import { useRequest } from '../hooks/request';
 <script setup lang="ts">
+import { useRequest } from '~/hooks';
+import { useTheme } from 'vuetify';
 const items = reactive([
     { title: 'Home', icon: 'mdi-home', to: '/' },
     { title: 'About', icon: 'mdi-account', to: '/about' },
-    { title: 'Contact', icon: 'mdi-phone', to: '/contact' },
-    { title: 'Login', icon: 'mdi-login', to: '/login' },
-    { title: 'Register', icon: 'mdi-account-plus', to: '/register' },
+    { title: 'Contact', icon: 'mdi-email', to: '/contact' }
   ])
 const drawer = ref(false)
-const response = ref(null)
-const fetchResponse = async () => {
-  const res = await fetch('/api')
-  response.value = await res.json()
-}
-onMounted(fetchResponse)
+const { response } = useRequest("/api")
+const theme = useTheme();
+const toggleDark = () => {
+    theme.global.name.value = theme.global.name.value === 'light' ? 'dark' : 'light';
+  };
 </script>
 <template>
     <v-navigation-drawer
@@ -22,7 +22,7 @@ onMounted(fetchResponse)
         >
       <v-list dense>
         <v-list-item link v-for="item in items" :key="item.title">
-            <RouterLink :to="item.to" exact row>
+            <RouterLink :to="item.to" exact row decoration-none>
             <v-icon mx-2>{{ item.icon }}</v-icon>
             <v-list-item-title> {{ item.title }}</v-list-item-title>
             </RouterLink>
@@ -39,8 +39,10 @@ onMounted(fetchResponse)
         ></v-app-bar-nav-icon>
         <v-toolbar-title>   {{response}}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn icon>
-            <v-icon>mdi-magnify</v-icon>
+        <v-btn icon
+          @click="toggleDark()"
+        >
+            <v-icon>{{ $vuetify.theme.current.dark ? 'mdi-lightbulb-off' : 'mdi-lightbulb-on' }}</v-icon>
         </v-btn>
         <v-btn icon>
             <v-icon>mdi-heart</v-icon>
